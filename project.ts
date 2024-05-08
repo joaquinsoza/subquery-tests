@@ -5,13 +5,16 @@ import {
 } from "@subql/types-stellar";
 import { Horizon } from "stellar-sdk";
 
-import * as dotenv from 'dotenv';
-import path from 'path';
+import * as dotenv from "dotenv";
+import path from "path";
 
-const mode = process.env.NODE_ENV || 'production';
+const mode = process.env.NODE_ENV || "production";
 
 // Load the appropriate .env file
-const dotenvPath = path.resolve(process.cwd(), `.env${mode !== 'production' ? `.${mode}` : ''}`);
+const dotenvPath = path.resolve(
+  process.cwd(),
+  `.env${mode !== "production" ? `.${mode}` : ""}`
+);
 dotenv.config({ path: dotenvPath });
 
 /* This is your project configuration */
@@ -40,7 +43,7 @@ const project: StellarProject = {
       'Test SDF Network ; September 2015' for testnet
       'Public Global Stellar Network ; September 2015' for mainnet
       'Test SDF Future Network ; October 2022' for Future Network */
-    chainId: process.env.CHAIN_ID!,
+    chainId: "Public Global Stellar Network ; September 2015",
     /**
      * These endpoint(s) should be public non-pruned archive node
      * We recommend providing more than one endpoint for improved reliability, performance, and uptime
@@ -50,49 +53,27 @@ const project: StellarProject = {
      * These settings can be found in your docker-compose.yaml, they will slow indexing but prevent your project being rate limited
      * You can find RPC endpoints for Stellar here https://soroban.stellar.org/docs/reference/rpc-list
      */
-    endpoint: process.env.ENDPOINT!?.split(',') as string[] | string,
+    endpoint: process.env.ENDPOINT!?.split(",") as string[] | string,
     /* This is a specific Soroban endpoint
       It is only required when you are using a soroban/EventHandler */
-    sorobanEndpoint: "https://soroban-rpc.mainnet.stellar.gateway.fm",
+    sorobanEndpoint:
+      "https://rpc.ankr.com/stellar_soroban/670aa62bb995fe0c0e45b316b0c4aca229b2cf47a6a8f44c7803e79c11cf8f5f",
   },
   dataSources: [
     {
       kind: StellarDatasourceKind.Runtime,
       /* Set this as a logical start block, it might be block 1 (genesis) or when your contract was deployed */
-      startBlock: 50460000,
+      startBlock: 50460054,
       mapping: {
         file: "./dist/index.js",
         handlers: [
           {
-            handler: "handleOperation",
-            kind: StellarHandlerKind.Operation,
-            filter: {
-              type: Horizon.HorizonApi.OperationResponseType.payment,
-            },
-          },
-          {
-            handler: "handleCredit",
-            kind: StellarHandlerKind.Effects,
-            filter: {
-              type: "account_credited",
-            },
-          },
-          {
-            handler: "handleDebit",
-            kind: StellarHandlerKind.Effects,
-            filter: {
-              type: "account_debited",
-            },
-          },
-          {
             handler: "handleEvent",
             kind: StellarHandlerKind.Event,
             filter: {
-              /* You can optionally specify a smart contract address here
-                contractId: "" */
-              topics: [
-                "transfer", // Topic signature(s) for the events, there can be up to 4
-              ],
+              contractId:
+                "CAG5LRYQ5JVEUI5TEID72EYOVX44TTUJT5BQR2J6J77FH65PCCFAJDDH",
+              topics: ["swap", "add", "remove"],
             },
           },
         ],
